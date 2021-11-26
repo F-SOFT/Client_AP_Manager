@@ -32,7 +32,7 @@ const CoursePage = () => {
             setLoad(false);
           }
         } catch (error) {
-          console.log("looix khoa hocj");
+          console.log("Error course");
           // <Redirect to="/notfound" />;
         }
       }

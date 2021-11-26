@@ -4,7 +4,7 @@ import { useStore, actionsAlert } from "../../context";
 const Alert = () => {
   const { alertState, dispatchAlert } = useStore();
   const { success, variant, text } = alertState;
-  console.log(alertState);
+
   let css;
   if (variant === "success") {
     css = "bg-green-100 border-green-500 text-green-700";

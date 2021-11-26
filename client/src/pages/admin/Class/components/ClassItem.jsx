@@ -3,30 +3,23 @@ import React, { memo } from "react";
 import TooltipUpdate from "../../../../components/tooltip/Update";
 import TooltipDelete from "../../../../components/tooltip/Delete";
 
-const UserItem = ({
-    user,
-    onFindUser,
-    onOpenUpdate,
-    onOpenDetailScore,
-    onOpenDelete,
-}) => {
+const ClassItem = ({ items, onOpenDetail, onOpenUpdate }) => {
     console.log("re-render");
     return (
         <div className="t-body text-sm text-gray-700 font-semibold col-span-3 mt-6">
-            <div className="hover:bg-gray-100 rounded-lg border border-gray-200 shadow-sm mb-3">
+            <div className="hover:bg-gray-100 rounded-lg shadow-md mb-3">
                 <ul className="grid grid-cols-7 gap-4 transform translate-y-1 p-2.5">
                     <li
                         className="col-span-5 cursor-pointer"
-                        onClick={() => onFindUser(user?.userCode)}
+                        onClick={() => onOpenDetail(items._id)}
                     >
-                        {user?.email ? user.email : ""}
+                        {items?.classCode}
                     </li>
 
                     <li>
                         <svg
-                            onClick={() => onOpenDetailScore(user?._id)}
                             xmlns="http://www.w3.org/2000/svg"
-                            className="h-6 w-6 ml-3 cursor-pointer"
+                            className="h-6 w-6 ml-8 cursor-pointer"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -35,14 +28,14 @@ const UserItem = ({
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
                                 strokeWidth={2}
-                                d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                d="M10 21h7a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v11m0 5l4.879-4.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242z"
                             />
                         </svg>
                     </li>
                     <li className="flex items-center justify-between">
-                        <TooltipUpdate title="CẬp nhật" placement="top-end">
+                        <TooltipUpdate title="Cập nhật" placement="top-end">
                             <svg
-                                onClick={() => onOpenUpdate(user?.userCode)}
+                                onClick={() => onOpenUpdate(items?._id)}
                                 xmlns="http://www.w3.org/2000/svg"
                                 className="h-6 w-6 ml-6 cursor-pointer"
                                 fill="none"
@@ -59,7 +52,7 @@ const UserItem = ({
                         </TooltipUpdate>
                         <TooltipDelete title="Xoá" placement="top-end">
                             <svg
-                                onClick={() => onOpenDelete(user?._id)}
+                                //   onClick={() => onOpenDelete(user?._id)}
                                 xmlns="http://www.w3.org/2000/svg"
                                 className="h-6 w-6 cursor-pointer"
                                 fill="none"
@@ -81,4 +74,4 @@ const UserItem = ({
     );
 };
 
-export default memo(UserItem);
+export default memo(ClassItem);

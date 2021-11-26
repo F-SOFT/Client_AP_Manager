@@ -5,10 +5,8 @@ import Icon from "../icon";
 
 const SubNavAdmin = () => {
   const location = useLocation();
-  let result;
   let twoEleResult;
   if (location.pathname) {
-    result = location.pathname.split("/")[1];
     twoEleResult = location.pathname.split("/")[2];
   }
   console.log(twoEleResult);
@@ -24,7 +22,11 @@ const SubNavAdmin = () => {
           }
           } flex flex-col items-center justify-center w-16 h-16 mt-4 cursor-pointer`}
         >
-          <Icon className="w-5 h-5">
+          <Icon
+            className={`w-5 h-5 ${
+              twoEleResult === undefined ? "text-green-600" : ""
+            }`}
+          >
             <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
           </Icon>
           <p className="text-xs">Dasboard</p>
@@ -37,9 +39,13 @@ const SubNavAdmin = () => {
               ? "active"
               : "hover:text-black hover:bg-white rounded-lg"
           }
-          } flex flex-col items-center justify-center w-16 h-16 mt-1.5 cursor-pointer`}
+          flex flex-col items-center justify-center w-16 h-16 mt-1.5 cursor-pointer`}
         >
-          <Icon className="w-5 h-5">
+          <Icon
+            className={`w-5 h-5 ${
+              twoEleResult === "category" ? "text-yellow-400" : ""
+            }`}
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -56,11 +62,13 @@ const SubNavAdmin = () => {
             twoEleResult === "course"
               ? "active"
               : "hover:text-black hover:bg-white rounded-lg"
-          } ${
-            result === "topic" ? "active" : ""
           } flex flex-col items-center justify-center w-16 h-16 mt-1.5 cursor-pointer`}
         >
-          <Icon className="w-5 h-5">
+          <Icon
+            className={`w-5 h-5 ${
+              twoEleResult === "course" ? "text-purple-600" : ""
+            }`}
+          >
             <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
           </Icon>
           <p className="text-xs">Course</p>
@@ -75,7 +83,11 @@ const SubNavAdmin = () => {
           }
           flex flex-col items-center justify-center w-16 h-16 mt-1.5 cursor-pointer`}
         >
-          <Icon className="w-5 h-5">
+          <Icon
+            className={`w-5 h-5 ${
+              twoEleResult === "user" ? "text-blue-700" : ""
+            }`}
+          >
             <path
               fillRule="evenodd"
               d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z"
@@ -86,23 +98,28 @@ const SubNavAdmin = () => {
         </Link>
 
         <Link
-          to={PATH.SCORE}
+          to={PATH.ADMIN_CLASS}
           className={`${
-            result === "score"
+            twoEleResult === "class"
               ? "active"
               : "hover:text-black hover:bg-white rounded-lg"
           }
           } flex flex-col items-center justify-center w-16 h-16 mt-1.5 cursor-pointer`}
         >
-          <Icon className="w-5 h-5">
+          <Icon
+            className={`w-5 h-5 ${
+              twoEleResult === "class" ? "text-red-600" : ""
+            }`}
+          >
             <path
-              fillRule="evenodd"
-              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-              clipRule="evenodd"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"
             />
           </Icon>
 
-          <p className="text-xs">Score</p>
+          <p className="text-xs">Class</p>
         </Link>
 
         <Link

@@ -5,13 +5,13 @@ const ScoreItem = ({ score, course, comment, dotTime }) => {
     <div className="">
       <div>
         <p className="mb-3 py-3 px-5 border-b border-gray-200">
-          <span className="mr-5 text-xl font-bold">Môn học:</span>
+          <span className="mr-5 text-xl font-bold text-white">Môn học:</span>
           <span className="font-semibold text-lg uppercase">{course}</span>
         </p>
 
         <div categories="grid grid-cols-3 gap-6 border-b border-gray-200">
-          <div className="col-span-3 bg-blue-500 rounded-t-lg">
-            <ul className="grid grid-cols-3 text-lg">
+          <div className="col-span-3 bg-blue-500 rounded-t-xl">
+            <ul className="grid grid-cols-3 text-lg text-white">
               <li className="pl-5 py-2 border border-white">Tên đàu điểm</li>
               <li className="pl-5 py-2 border border-white">Trọng số</li>
               <li className="pl-5 py-2 border border-white">Điểm</li>

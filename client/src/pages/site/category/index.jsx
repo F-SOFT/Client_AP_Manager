@@ -12,7 +12,7 @@ const CategoryPage = () => {
       <div className="mx-10">
         <div className="text-gradient w-max">
           <p className="text-2xl font-bold text-white pt-2 pl-14">
-            Chuyên nghành
+            Major
           </p>
         </div>
         {isLoading ? (

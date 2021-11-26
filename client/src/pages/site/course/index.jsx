@@ -65,7 +65,7 @@ const CoursePage = () => {
               />
             </div>
             <div className="relative">
-              <p className="text-2xl font-bold my-8">Lộ trình học</p>
+              <p className="text-2xl font-bold my-8">Study route</p>
 
               <div className="grid grid-cols-4">
                 {courseMajor.map((course) => (

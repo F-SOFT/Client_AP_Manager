@@ -3,21 +3,19 @@ import React, { useCallback, useEffect, useState } from "react";
 import Class from "../../../apis/class";
 
 import ClassItem from "./components/ClassItem";
-import DetailClass from "./components/DetailClass";
 import Plus from "../../../components/plus";
 import PlusItem from "../../../components/plus/components/PlusItem";
 import CreateClass from "./components/CreateClass";
 import UpdateClass from "./components/UpdateClass";
+import AddStudent from "./components/AddStudent";
+import Pagination from "../../../components/pagination";
 
 const ClassPage = () => {
     const [classData, setClassData] = useState({
         isLoading: true,
         classes: [],
     });
-    const [isOpenDetail, setIsOpenDetail] = useState({
-        isOpen: false,
-        selectClass: {},
-    });
+    console.log(classData.classes);
     const [isOpenCreate, setOpenCreate] = useState({
         isOpen: false,
         isRefesh: false,
@@ -25,35 +23,45 @@ const ClassPage = () => {
     const [isOpenUpdate, setIsOpenUpdate] = useState({
         isOpen: false,
         classUpdate: {},
+        isRefesh: false,
+    });
+    const [isOpenAddStudent, setIsOpenAddStudent] = useState({
+        isOpen: false,
+        classAddStudent: {},
+        isRefesh: false,
+    });
+    const [paginations, setPagination] = useState({
+        _page: 1,
+        _totalRow: 1,
+        _limit: 5,
+    });
+    const [filterClass, setFilterClass] = useState({
+        id: null,
+        _page: 1,
+        _limit: 6,
     });
 
-    console.log(isOpenUpdate);
+    console.log(classData);
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await Class.getClasses();
+                const response = await Class.getClasses(
+                    filterClass._page,
+                    filterClass._limit
+                );
 
-                setClassData({ isLoading: false, classes: response });
+                setClassData({ isLoading: false, classes: response.classes });
+                setPagination(response.pagination);
             } catch (error) {
                 console.log(error);
             }
         };
 
         fetchData();
-    }, []);
-
-    const handleOpenDetail = useCallback(
-        (classId) => {
-            setIsOpenDetail({
-                isOpen: true,
-                selectClass: classData.classes.find(
-                    (cls) => cls._id === classId
-                ),
-            });
-        },
-        [classData.classes]
-    );
-
+    }, [isOpenCreate.isRefesh, filterClass]);
+    const handlePageChange = (newPage) => {
+        setFilterClass({ ...filterClass, _page: newPage });
+    };
     const handleOpenCreate = useCallback(() => {
         setOpenCreate((pve) => {
             return {
@@ -75,8 +83,21 @@ const ClassPage = () => {
         [classData.classes]
     );
 
+    const handleOpenAddStudent = useCallback(
+        (classId) => {
+            setIsOpenAddStudent((pre) => {
+                return {
+                    isOpen: true,
+                    classAddStudent: classData.classes.find(
+                        (cls) => cls._id === classId
+                    ),
+                };
+            });
+        },
+        [classData.classes]
+    );
+
     const handleClose = useCallback(() => {
-        setIsOpenDetail({ isOpen: false, selectClass: {} });
         setOpenCreate((pve) => {
             return {
                 ...pve,
@@ -84,6 +105,12 @@ const ClassPage = () => {
             };
         });
         setIsOpenUpdate({ isOpen: false, classUpdate: {} });
+        setIsOpenAddStudent((pve) => {
+            return {
+                ...pve,
+                isOpen: false,
+            };
+        });
     }, []);
 
     const handleRefeshData = useCallback(() => {
@@ -100,8 +127,8 @@ const ClassPage = () => {
             <div className="mx-10">
                 <div className="flex justify-between">
                     <div className="text-gradient">
-                        <p className="text-2xl font-bold text-white pt-2 pl-14">
-                            Manager User
+                        <p className="text-3xl text-white font-semibold pt-1.5 pl-14">
+                            Manager Class
                         </p>
                     </div>
                     <div className="mt-6">
@@ -116,13 +143,14 @@ const ClassPage = () => {
                 </div>
 
                 <div className="mt-14">
-                    <div className="t-head text-md text-white font-bold col-span-3 shadow-lg">
+                    <div className="t-head text-md text-white font-semibold col-span-3 shadow-lg">
                         <ul className="flex items-center grid grid-cols-7 gap-4 p-3 rounded-t-xl bg-gray-500">
                             <li className="col-span-5">Name</li>
+
                             <li className="">Thêm sinh viên</li>
                             <li className="flex items-center justify-between">
-                                <p>Cập nhật</p>
-                                <p>Xoá</p>
+                                <span>Cập nhật</span>
+                                <span>Xoá</span>
                             </li>
                         </ul>
                     </div>
@@ -136,8 +164,9 @@ const ClassPage = () => {
                             <div key={cls._id}>
                                 <ClassItem
                                     items={cls}
-                                    onOpenDetail={handleOpenDetail}
                                     onOpenUpdate={handleOpenUpdate}
+                                    onOpenAddStudent={handleOpenAddStudent}
+                                    onRefesh={handleRefeshData}
                                 />
                             </div>
                         ))
@@ -145,12 +174,6 @@ const ClassPage = () => {
                         "Có lỗi vui lòng thử lại sau"
                     )}
                 </div>
-
-                <DetailClass
-                    isOpen={isOpenDetail.isOpen}
-                    classData={isOpenDetail.selectClass}
-                    onClose={handleClose}
-                />
 
                 <CreateClass
                     isOpen={isOpenCreate.isOpen}
@@ -160,10 +183,22 @@ const ClassPage = () => {
 
                 <UpdateClass
                     isOpen={isOpenUpdate.isOpen}
-                    selectClass={isOpenUpdate.selectClass}
+                    selectClass={isOpenUpdate.classUpdate}
                     onClose={handleClose}
+                    onRefesh={handleRefeshData}
+                />
+
+                <AddStudent
+                    isOpen={isOpenAddStudent.isOpen}
+                    classId={isOpenAddStudent.classAddStudent._id}
+                    onClose={handleClose}
+                    onRefesh={handleRefeshData}
                 />
             </div>
+            <Pagination
+                pagination={paginations ? paginations : {}}
+                onPageChange={handlePageChange}
+            />
         </div>
     );
 };

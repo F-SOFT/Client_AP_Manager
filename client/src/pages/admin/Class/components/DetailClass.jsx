@@ -1,75 +1,195 @@
-import React, { memo } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import Dialog from "@material-ui/core/Dialog";
-import ListItem from "@material-ui/core/ListItem";
-import List from "@material-ui/core/List";
-import Divider from "@material-ui/core/Divider";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import IconButton from "@material-ui/core/IconButton";
-import Typography from "@material-ui/core/Typography";
-import CloseIcon from "@material-ui/icons/Close";
+import React, { memo, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { List, ListItem, Divider } from "@material-ui/core";
 
-const useStyles = makeStyles((theme) => ({
-  appBar: {
-    position: "relative",
-    background: "white",
-    color: "black",
-  },
-  title: {
-    marginLeft: theme.spacing(2),
-    flex: 1,
-  },
-}));
+import Class from "../../../../apis/class";
+import Auth from "../../../../apis/auth";
+import TooltipDelete from "../../../../components/tooltip/Delete";
+import UserDetail from "./UserDetail";
 
-function DetailCourse({ isOpen, classData, onClose }) {
-  const classes = useStyles();
+function DetailCourse() {
+    const { id } = useParams();
+    const [classData, setClassData] = useState({
+        isLoading: true,
+        nameClass: "",
+        teacherData: {},
+        students: [],
+    });
+    const [userDetail, setUserDetail] = useState({
+        isOpen: false,
+        selectUser: "",
+    });
+    const [data, setData] = useState({
+        isLoading: true,
+        userData: {},
+    });
+    const [isRefesh, setIsRefesh] = useState(true);
 
-  return (
-    <div>
-      <Dialog fullScreen open={isOpen} onClose={onClose}>
-        <AppBar className={classes.appBar}>
-          <Toolbar>
-            <Typography variant="h6" className={classes.title}>
-              Logo
-            </Typography>
-            <IconButton
-              edge="start"
-              color="inherit"
-              onClick={onClose}
-              aria-label="close"
-            >
-              <CloseIcon />
-            </IconButton>
-          </Toolbar>
-        </AppBar>
-        <div className="bg-gray-100 h-full w-full mx-auto">
-          <div className="bg-white h-4/5 w-1/2 p-10 my-10 mx-auto rounded-2xl">
-            <div className="text-gradient w-max">
-              <p className="font-bold text-2xl pt-2 pl-14 pr-10 text-white">
-                Thông tin lớp học
-              </p>
+    const handleRefesh = () => {
+        setIsRefesh(!isRefesh);
+    };
+
+    const handleOpenUserDetail = (userId) => {
+        setUserDetail({
+            isOpen: true,
+            selectUser: userId,
+        });
+    };
+    const handleClose = () => {
+        setUserDetail({
+            isOpen: false,
+            selectUser: "",
+        });
+    };
+
+    const handleRemoveStudent = async (idStudent) => {
+        try {
+            const response = await Class.removeStudent(id, {
+                studentId: idStudent,
+            });
+            if (response) {
+                handleRefesh();
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    useEffect(() => {
+        const fetchData = async () => {
+            setClassData((pre) => ({ ...pre, isLoading: true }));
+            try {
+                const response = await Class.getUsersClass(id);
+
+                if (response) {
+                    setClassData({
+                        isLoading: false,
+                        nameClass: response.classInfomation.name,
+                        teacherData: response.classInfomation.teacherId,
+                        students: response.classInfomation.studentId,
+                    });
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
+        if (id) {
+            fetchData();
+        }
+    }, [id, isRefesh]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            setData((pre) => ({ ...pre, isLoading: true }));
+            try {
+                const response = await Auth.userDetail(userDetail.selectUser);
+
+                if (response.success) {
+                    setData({ isLoading: false, userData: response.user });
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
+        if (userDetail.selectUser) {
+            fetchData();
+        }
+    }, [userDetail.selectUser]);
+
+    return (
+        <div className="page bg-white">
+            <div className="mx-10">
+                <div className="flex justify-between">
+                    <div className="text-gradient">
+                        <p className="text-3xl text-white font-semibold pt-1.5 pl-14">
+                            Class Detail
+                        </p>
+                    </div>
+                </div>
+
+                {classData.isLoading ? (
+                    <div className="loader">
+                        <div className="spinner"></div>
+                    </div>
+                ) : (
+                    <div className="mt-14" style={{ overflow: "hidden" }}>
+                        <List>
+                            <ListItem button className="font-semibold">
+                                Tên Lớp học: {classData.nameClass}
+                            </ListItem>
+                            <Divider />
+                            <ListItem button className="font-semibold">
+                                Giáo viên: {classData.teacherData.fullName}
+                            </ListItem>
+                            <Divider />
+                            <ListItem button className="font-semibold">
+                                Danh sách sinh viên
+                            </ListItem>
+                            <Divider />
+                            <ListItem
+                                className="overflow-auto"
+                                style={{
+                                    height: "460px",
+                                    display: "block",
+                                }}
+                            >
+                                {classData.students.map((student) => (
+                                    <div className="w-full" key={student._id}>
+                                        <div className="flex items-center py-2 px-1 cursor-pointer hover:bg-gray-100">
+                                            <span
+                                                className="flex-1"
+                                                onClick={() =>
+                                                    handleOpenUserDetail(
+                                                        student._id
+                                                    )
+                                                }
+                                            >
+                                                {student.fullName}
+                                            </span>
+
+                                            <TooltipDelete
+                                                title="Xoá sinh viên"
+                                                placement="top-end"
+                                            >
+                                                <svg
+                                                    onClick={() =>
+                                                        handleRemoveStudent(
+                                                            student._id
+                                                        )
+                                                    }
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    className="h-6 w-6 text-red-600"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke="currentColor"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        strokeWidth={2}
+                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                                    />
+                                                </svg>
+                                            </TooltipDelete>
+                                        </div>
+                                        <Divider />
+                                    </div>
+                                ))}
+                            </ListItem>
+                        </List>
+                    </div>
+                )}
             </div>
 
-            <div className="mt-14">
-              <List>
-                <ListItem button>Tên Lớp học: {classData?.classCode}</ListItem>
-                <Divider />
-                <ListItem button>
-                  Giáo viên: {classData?.teacherId?.fullName}
-                </ListItem>
-                <Divider />
-                <ListItem button>
-                  Số học sinh trong lớp: {classData?.studentId?.length}
-                </ListItem>
-                <Divider />
-              </List>
-            </div>
-          </div>
+            <UserDetail
+                isOpen={userDetail.isOpen}
+                data={data}
+                handleClose={handleClose}
+            />
         </div>
-      </Dialog>
-    </div>
-  );
+    );
 }
 
 export default memo(DetailCourse);

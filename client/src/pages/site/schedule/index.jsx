@@ -21,8 +21,11 @@ const SchedulePage = () => {
             try {
                 const response = await Class.getClassUser();
                 console.log(response);
-                if (response) {
-                    setClassData({ isLoading: false, classes: response });
+                if (response.success) {
+                    setClassData({
+                        isLoading: false,
+                        classes: response.classes,
+                    });
                 }
             } catch (error) {
                 console.log(error);
@@ -41,7 +44,10 @@ const SchedulePage = () => {
                 );
 
                 if (response) {
-                    setScheduleData({ isLoading: false, schedule: response });
+                    setScheduleData({
+                        isLoading: false,
+                        schedule: response.data,
+                    });
                 }
             } catch (error) {
                 console.log(error);
@@ -81,7 +87,7 @@ const SchedulePage = () => {
                                 Lọc theo lớp
                             </option>
                             {classData.classes.map((cl) => (
-                                <option value={cl._id} key={cl._id}>
+                                <option value={cl.classCode} key={cl._id}>
                                     lớp {cl.name}
                                 </option>
                             ))}
@@ -106,7 +112,7 @@ const SchedulePage = () => {
                             </div>
 
                             <div className="t-body text-lg text-gray-500 col-span-3">
-                                {scheduleData.schedule.map((scdl) => (
+                                {scheduleData.schedule?.map((scdl) => (
                                     <div key={scdl._id}>
                                         <ScheduleItem
                                             date={scdl.date}

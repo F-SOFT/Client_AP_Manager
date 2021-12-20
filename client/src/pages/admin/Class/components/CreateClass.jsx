@@ -1,82 +1,157 @@
 import React, { memo, useEffect, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import Dialog from "@material-ui/core/Dialog";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import IconButton from "@material-ui/core/IconButton";
-import Typography from "@material-ui/core/Typography";
-import CloseIcon from "@material-ui/icons/Close";
-import Button from "@material-ui/core/Button";
+import { debounce } from "lodash";
+import { Select, Spin, Modal } from "antd";
 
-import Input from "../../../../components/input";
 import Class from "../../../../apis/class";
 import User from "../../../../apis/auth";
+import Course from "../../../../apis/course";
 import { useStore, actionsAlert } from "../../../../context";
+import Input from "../../../../components/input";
 
-const useStyles = makeStyles((theme) => ({
-    appBar: {
-        position: "relative",
-        background: "white",
-        color: "black",
-    },
-    title: {
-        marginLeft: theme.spacing(2),
-        flex: 1,
-    },
-}));
+function DebounceSelect({ fetchOptions, debounceTimeout = 300, ...props }) {
+    const [fetching, setFetching] = useState(false);
+    const [options, setOptions] = useState([]);
+
+    const debounceFetcher = React.useMemo(() => {
+        const loadOptions = (value) => {
+            setOptions([]);
+            setFetching(true);
+
+            fetchOptions(value).then((newOptions) => {
+                const customOptions =
+                    newOptions.user.length > 0
+                        ? newOptions.user.filter((option) => {
+                              return option.userCode.split("-")[0] === "FSTC";
+                          })
+                        : [
+                              {
+                                  _id: "1",
+                                  fullName: "Không tìm thấy",
+                                  userCode: "Not found",
+                              },
+                          ];
+                setOptions(customOptions);
+                setFetching(false);
+            });
+        };
+
+        return debounce(loadOptions, debounceTimeout);
+    }, [debounceTimeout, fetchOptions]);
+
+    useEffect(() => {
+        return () => {
+            // clear when unmount
+            setOptions([]);
+        };
+    }, []);
+
+    return (
+        <Select
+            showSearch
+            labelInValue
+            filterOption={false}
+            onSearch={debounceFetcher}
+            notFoundContent={fetching ? <Spin size="small" /> : null}
+            {...props}
+        >
+            {options.map((opt) => (
+                <Select.Option key={opt._id} value={opt._id}>
+                    {` ${opt.fullName} -`}{" "}
+                    <span className="text-xs text-gray-400">
+                        {opt.userCode}
+                    </span>
+                </Select.Option>
+            ))}
+        </Select>
+    );
+}
+
+// Fetch Course
+function DebounceSelectCourse({
+    fetchOptions,
+    debounceTimeout = 300,
+    ...props
+}) {
+    const [fetching, setFetching] = useState(false);
+    const [options, setOptions] = useState([]);
+
+    const debounceFetcher = React.useMemo(() => {
+        const loadOptions = (value) => {
+            setOptions([]);
+            setFetching(true);
+
+            fetchOptions(value).then((newOptions) => {
+                console.log(newOptions);
+                setOptions(newOptions.courses);
+                setFetching(false);
+            });
+        };
+
+        return debounce(loadOptions, debounceTimeout);
+    }, [debounceTimeout, fetchOptions]);
+
+    useEffect(() => {
+        return () => {
+            // clear when unmount
+            setOptions([]);
+        };
+    }, []);
+
+    return (
+        <Select
+            showSearch
+            labelInValue
+            filterOption={false}
+            onSearch={debounceFetcher}
+            notFoundContent={fetching ? <Spin size="small" /> : null}
+            {...props}
+        >
+            {options.map((opt) => (
+                <Select.Option key={opt._id} value={opt._id}>
+                    {` ${opt.name}`}
+                </Select.Option>
+            ))}
+        </Select>
+    );
+}
+
+function fetchUserList(search) {
+    return User.user_search(search);
+}
+function fetchCourseList(search) {
+    return Course.searchCourse(search);
+}
 
 function CreateClass({ isOpen, onClose, onRefesh }) {
     const { dispatchAlert } = useStore();
-    const classes = useStyles();
-    const [teachers, setTeachers] = useState({
-        isLoading: true,
-        teacherData: [],
-    });
+
     const [classData, setClassData] = useState({
         name: "",
         classCode: "",
         courseId: "",
         teacherId: "",
     });
-    console.log(teachers);
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                setTeachers((pre) => {
-                    return {
-                        ...pre,
-                        isLoading: true,
-                    };
-                });
-                const response = await User.findUser(
-                    "617d04d70682a0a38c0421c6"
-                );
-
-                if (response) {
-                    setTeachers({
-                        isLoading: false,
-                        teacherData: response,
-                    });
-                }
-            } catch (error) {
-                console.log(error);
-            }
-        };
-
-        fetchData();
-    }, []);
+    const [value, setValue] = useState();
+    const [valueCourse, setValueCourse] = useState();
 
     const handleChangeInput = (e) => {
         setClassData({ ...classData, [e.target.name]: e.target.value });
     };
-
+    console.log(classData);
     const handleCreateClass = async () => {
         try {
             const response = await Class.postClass(classData);
-            // if (response) {
-            // onClose();
-            // onRefesh();
-            console.log(response);
+            if (response) {
+                onClose();
+                onRefesh();
+                console.log(response);
+                setClassData({
+                    name: "",
+                    classCode: "",
+                    courseId: "",
+                    teacherId: "",
+                });
+            }
             dispatchAlert(
                 actionsAlert.alertActions.display({
                     variant: "success",
@@ -91,95 +166,64 @@ function CreateClass({ isOpen, onClose, onRefesh }) {
 
     return (
         <div>
-            <Dialog fullScreen open={isOpen} onClose={onClose}>
-                <AppBar className={classes.appBar}>
-                    <Toolbar>
-                        <Typography variant="h6" className={classes.title}>
-                            Logo
-                        </Typography>
-                        <IconButton
-                            edge="start"
-                            color="inherit"
-                            onClick={onClose}
-                            aria-label="close"
-                        >
-                            <CloseIcon />
-                        </IconButton>
-                    </Toolbar>
-                </AppBar>
-                <div className="bg-gray-100 h-full">
-                    <div className="m-10 bg-white h-4/5 p-10 rounded-2xl">
-                        <div className="text-gradient w-max">
-                            <p className="font-bold text-2xl text-white pt-2 pl-14">
-                                Tạo mới lớp học
-                            </p>
-                        </div>
+            <Modal
+                title="Tạo mới lớp học"
+                visible={isOpen}
+                onOk={handleCreateClass}
+                onCancel={onClose}
+                destroyOnClose={true}
+            >
+                <Input
+                    isIcon="courseIcon"
+                    css="w-full"
+                    name="name"
+                    placeholder="Tên lớp học"
+                    value={classData.name}
+                    handleChange={handleChangeInput}
+                />
+                <Input
+                    isIcon="passwordIcon"
+                    css="w-full"
+                    name="classCode"
+                    placeholder="Mã lớp học"
+                    value={classData.classCode}
+                    handleChange={handleChangeInput}
+                />
 
-                        <div className="mt-14">
-                            {teachers.isLoading ? (
-                                <div className="loader">
-                                    <div className="spinner"></div>
-                                </div>
-                            ) : (
-                                <div className="">
-                                    <p className="text-xl font-bold text-center">
-                                        Thông tin lớp
-                                    </p>
-                                    <Input
-                                        placeholder="Tên lớp học"
-                                        name="name"
-                                        value={classData?.name}
-                                        isIcon="bookIcon"
-                                        handleChange={handleChangeInput}
-                                    />
-                                    <Input
-                                        placeholder="Mã lớp hoc"
-                                        name="classCode"
-                                        value={classData?.classCode}
-                                        isIcon="bookIcon"
-                                        handleChange={handleChangeInput}
-                                    />
-                                    <select
-                                        className="w-1/2 py-2 px-5 border border-gray-400 flex mx-auto rounded-xl text-gray-500 focus:outline-none"
-                                        name="teacherId"
-                                        onChange={handleChangeInput}
-                                    >
-                                        <option
-                                            defaultValue={""}
-                                            selected="selected"
-                                            hidden="hidden"
-                                        >
-                                            Giáo viên
-                                        </option>
-                                        {teachers?.teacherData.length > 0
-                                            ? teachers.teacherData.map(
-                                                  (teacher) => (
-                                                      <option
-                                                          value={teacher._id}
-                                                          key={teacher._id}
-                                                      >
-                                                          {teacher.fullName}
-                                                      </option>
-                                                  )
-                                              )
-                                            : ""}
-                                    </select>
+                <DebounceSelectCourse
+                    name="search-user"
+                    label="Chọn môn học"
+                    value={valueCourse}
+                    placeholder="Nhập tên môn học"
+                    fetchOptions={fetchCourseList}
+                    onChange={(newValue) => {
+                        setValueCourse(newValue);
+                        setClassData((pre) => ({
+                            ...pre,
+                            courseId: newValue.value,
+                        }));
+                    }}
+                    style={{ width: "100%" }}
+                />
 
-                                    <div className="mx-auto w-72 mt-6">
-                                        <Button
-                                            variant="contained"
-                                            color="primary"
-                                            onClick={handleCreateClass}
-                                        >
-                                            Tạo mới
-                                        </Button>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
+                <div className="mt-4">
+                    <DebounceSelect
+                        name="search-user"
+                        label="Chọn giáo viên"
+                        value={value}
+                        placeholder="Nhập tên giáo viên"
+                        fetchOptions={fetchUserList}
+                        onChange={(newValue) => {
+                            setValue(newValue);
+                            setClassData((pre) => ({
+                                ...pre,
+                                teacherId: newValue.value,
+                            }));
+                        }}
+                        style={{ width: "100%" }}
+                    />
                 </div>
-            </Dialog>
+            </Modal>
         </div>
     );
 }

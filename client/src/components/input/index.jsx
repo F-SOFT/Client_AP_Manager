@@ -27,7 +27,15 @@ const CssTextField = withStyles({
     },
 })(TextField);
 
-const Input = ({ name, placeholder, value, isIcon, css, handleChange }) => {
+const Input = ({
+    name,
+    placeholder,
+    value,
+    isIcon,
+    css,
+    handleChange,
+    ...rest
+}) => {
     let icon;
 
     if (isIcon === "userIcon") {
@@ -71,6 +79,7 @@ const Input = ({ name, placeholder, value, isIcon, css, handleChange }) => {
                         value={value}
                         name={name}
                         onChange={handleChange}
+                        {...rest}
                     />
                 </Grid>
             </Grid>

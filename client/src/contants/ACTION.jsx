@@ -10,6 +10,7 @@ export const AUTHACTIONS = {
     POST_USER: "post_user",
     DELETE_USER: "delete_user",
     UPDATE_USER: "update_user",
+    USER_UPDATE_PROFILE: "user_update_profile",
     FIND_USER: "find_user",
 };
 

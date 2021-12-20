@@ -1,20 +1,22 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { Tooltip } from "antd";
 
 import { useStore, actions, actionsAlert } from "../../../context";
 import Auth from "../../../apis/auth";
 import Score from "../../../apis/score";
 import Plus from "../../../components/plus";
 import PlusItem from "../../../components/plus/components/PlusItem";
-import Modal from "./components/Modal";
+import CreateUser from "./components/CreateUser";
 import UserItem from "./components/UserItem";
 import UserDetail from "../../site/profile/components/UserDetail";
 import ScoreDetail from "./components/DetailScore";
-import UpdateUser from "./components/UpdateUuser";
+import UpdateUser from "./components/UpdateUser";
 import ModalConfim from "../../../components/modal/ModalConfirm";
 import Alert from "../../../components/alert";
 import Pagination from "../../../components/pagination";
 
 const ManagerUser = () => {
+    console.log(window.innerHeight);
     const {
         authState: { isLoading, roles, userFind },
         dispatchAuth,
@@ -203,11 +205,27 @@ const ManagerUser = () => {
             <div className="mx-10">
                 <div className="flex justify-between">
                     <div className="text-gradient">
-                        <p className="text-2xl font-bold text-white pt-2 pl-14">
+                        <p className="text-3xl text-white font-semibold pt-1.5 pl-14">
                             Manager User
                         </p>
                     </div>
-                    <div className="mt-6">
+                    <div className="mt-6 flex items-center">
+                        <Tooltip title="Filter">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-6 w-6 mr-6 cursor-pointer"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+                                />
+                            </svg>
+                        </Tooltip>
                         <Plus>
                             <PlusItem
                                 handleOpen={handleOpen}
@@ -218,14 +236,14 @@ const ManagerUser = () => {
                     </div>
                 </div>
 
-                <div className="mt-14">
-                    <div className="t-head text-md text-white font-bold col-span-3 shadow-lg">
+                <div className="mt-10">
+                    <div className="t-head text-lg text-white font-semibold col-span-3 shadow-lg">
                         <ul className="flex items-center grid grid-cols-7 gap-4 p-3 rounded-t-xl bg-gray-500">
                             <li className="col-span-5">Email</li>
                             <li className="">Điểm</li>
                             <li className="flex items-center justify-between">
-                                <p>Cập nhật</p>
-                                <p>Xoá</p>
+                                <span>Cập nhật</span>
+                                <span>Xoá</span>
                             </li>
                         </ul>
                     </div>
@@ -250,11 +268,12 @@ const ManagerUser = () => {
                 </div>
 
                 <div>
-                    <Modal
+                    <CreateUser
                         isOpen={isOpen}
                         handleClose={handleCloseCreate}
                         roles={roles}
                         majors={majors}
+                        onRefesh={setIsRefesh}
                     />
 
                     <UpdateUser

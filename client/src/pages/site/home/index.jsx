@@ -19,7 +19,7 @@ const HomePage = () => {
                 if (response) {
                     setMajorData({
                         isLoading: false,
-                        majors: response,
+                        majors: response.majors,
                     });
                 }
             } catch (error) {
@@ -42,14 +42,14 @@ const HomePage = () => {
                         Danh mục khoá học
                     </p>
                 </div>
-                <div className="grid grid-cols-4 mt-16 mx-10">
+                <div className="grid xl:grid-cols-4 mt-16 mx-10 lg:grid-cols-2">
                     {majorData.isLoading ? (
                         <div className="loader">
                             <div className="spinner"></div>
                         </div>
                     ) : (
                         majorData.majors.map((major) => (
-                            <div key={major._id}>
+                            <div key={major._id} className="mx-auto">
                                 <Link to={"categories/" + major.slug}>
                                     <Card name={major.name} img={major.image} />
                                 </Link>

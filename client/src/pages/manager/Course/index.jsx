@@ -6,7 +6,7 @@ import Plus from "../../../components/plus";
 import PlusItem from "../../../components/plus/components/PlusItem";
 import { useStore, actionsCourse, actionsAlert } from "../../../context";
 import Course from "../../../apis/course";
-import Icon from "../../../components/icon";
+// import Icon from "../../../components/icon";
 import CreateCourse from "./components/CreateCourse";
 import UpdateCourse from "./components/UpdateCourse";
 import DeleteCourse from "../../../components/modal/ModalConfirm";
@@ -15,12 +15,14 @@ import Alert from "../../../components/alert";
 
 const ManagerCoursePage = () => {
     const {
-        majorState: { majors },
-        courseState: { courses_pagination, courseFind },
+        // majorState: { majors },
+        courseState: { courseFind },
         dispatchCourse,
         dispatchAlert,
     } = useStore();
     const [isOpenInfo, setIsOpenInfo] = useState(false);
+    const [coursePagiantion, setCoursePagiantion] = useState([]);
+    const [isRefesh, setIsRefesh] = useState(false);
     const [courseMajor, setCourseMajor] = useState([]);
     const [isOpenCreate, setIsOpenCreate] = useState(false);
     const [isOpenUpdate, setIsOpenUpdate] = useState(false);
@@ -34,7 +36,7 @@ const ManagerCoursePage = () => {
     const [filterCourse, setFilterCourse] = useState({
         id: null,
         _page: 1,
-        _limit: 5,
+        _limit: 6,
     });
 
     console.log("course-re-render");
@@ -68,18 +70,18 @@ const ManagerCoursePage = () => {
                     const { pagination, courses } = response;
                     setPagination(pagination);
                     setIsLoad(false);
-                    dispatchCourse(
-                        actionsCourse.courseActions.get_courses_pagination(
-                            courses
-                        )
-                    );
+                    setCoursePagiantion(courses);
                 } catch (error) {
                     console.log(error);
                 }
             }
         };
         fetchData();
-    }, [dispatchCourse, filterCourse, courseMajor.length]);
+    }, [dispatchCourse, filterCourse, courseMajor.length, isRefesh]);
+
+    const handleRefeshData = () => {
+        setIsRefesh((pre) => !pre);
+    };
 
     const handlePageChange = (newPage) => {
         setFilterCourse({ ...filterCourse, _page: newPage });
@@ -108,12 +110,12 @@ const ManagerCoursePage = () => {
         setIsOpenUpdate(false);
     }, []);
 
-    const handleMajorChange = (idMajor) => {
-        setFilterCourse({ id: idMajor });
-    };
+    // const handleMajorChange = (idMajor) => {
+    //     setFilterCourse({ id: idMajor });
+    // };
 
     const handleFindCourse = (idCourse) => {
-        const courseFind = courses_pagination.find(
+        const courseFind = coursePagiantion.find(
             (course) => course._id === idCourse
         );
 
@@ -125,9 +127,7 @@ const ManagerCoursePage = () => {
             const response = await Course.deleteCourse(courseFind?._id);
 
             if (response) {
-                dispatchCourse(
-                    actionsCourse.courseActions.delete_course(response.course)
-                );
+                handleRefeshData();
                 dispatchAlert(
                     actionsAlert.alertActions.display({
                         variant: "success",
@@ -145,7 +145,7 @@ const ManagerCoursePage = () => {
             <div className="mx-10">
                 <div className="flex justify-between">
                     <div className="text-gradient w-max">
-                        <p className="text-2xl font-bold text-white pt-2 pl-14">
+                        <p className="text-3xl text-white font-semibold pt-1.5 pl-14">
                             Manager Course
                         </p>
                     </div>
@@ -156,7 +156,7 @@ const ManagerCoursePage = () => {
                                 name="Tạo mới môn học"
                                 path="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
                             />
-                            {majors.map((major) => (
+                            {/* {majors.map((major) => (
                                 <div
                                     className={`w-full my-3 font-bold ${
                                         major._id === filterCourse.id
@@ -180,19 +180,19 @@ const ManagerCoursePage = () => {
                                         <p className="">{major.name}</p>
                                     </div>
                                 </div>
-                            ))}
+                            ))} */}
                         </Plus>
                     </div>
                 </div>
 
-                <div className="mt-14">
-                    <div className="t-head text-md text-white font-bold col-span-3">
+                <div className="mt-10">
+                    <div className="t-head text-lg text-white font-semibold col-span-3">
                         <ul className="flex items-center grid grid-cols-7 gap-4 p-3 rounded-t-xl shadow-lg bg-gray-500">
                             <li className="col-span-5">Tên môn học</li>
                             <li>Chi tiết</li>
                             <li className="flex items-center justify-between">
-                                <p>Cập nhật</p>
-                                <p>Xoá</p>
+                                <span>Cập nhật</span>
+                                <span>Xoá</span>
                             </li>
                         </ul>
                     </div>
@@ -220,7 +220,7 @@ const ManagerCoursePage = () => {
                             ))
                         )
                     ) : (
-                        courses_pagination?.map((course) => (
+                        coursePagiantion?.map((course) => (
                             <div key={course._id}>
                                 <CourseItem
                                     id={course._id}
@@ -243,11 +243,13 @@ const ManagerCoursePage = () => {
                         <CreateCourse
                             isOpen={isOpenCreate}
                             onClose={handleClose}
+                            onRefesh={handleRefeshData}
                         />
 
                         <UpdateCourse
                             isOpen={isOpenUpdate}
                             onClose={handleClose}
+                            onRefesh={handleRefeshData}
                         />
 
                         <DeleteCourse
@@ -260,7 +262,7 @@ const ManagerCoursePage = () => {
                     </div>
                 </div>
             </div>
-            {courseMajor?.length === 0 ? (
+            {courseMajor?.length === 0 && paginations._totalRow > 1 ? (
                 <Pagination
                     pagination={paginations ? paginations : {}}
                     onPageChange={handlePageChange}

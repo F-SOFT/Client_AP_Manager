@@ -9,6 +9,7 @@ import Alert from "./components/alert";
 import Header from "./components/header";
 import SubNavSite from "./components/subnav/SubNavSite";
 import SubNavAdmin from "./components/subnav/SubNavAdmin";
+import SubNavTrainner from "./components/subnav/SubNavTrainner";
 
 import LoginPage from "./pages/site/login";
 import HomePage from "./pages/site/home";
@@ -22,9 +23,17 @@ import CoursePage from "./pages/site/course";
 import AdminPage from "./pages/admin/Dasboard";
 import ManagerUserPage from "./pages/admin/User";
 import ManagerClassPage from "./pages/admin/Class";
+import ManagerScore from "./pages/admin/Score";
+import ManagerClassDetailPage from "./pages/admin/Class/components/DetailClass";
+import TopicPage from "./pages/admin/Topic";
 
 import ManagerCoursePage from "./pages/manager/Course";
 import ManagerCategoryPage from "./pages/manager/category";
+import Test from "./pages/admin/Class/components/test";
+
+import ClassTrainnerPage from "./pages/trainner/class";
+import ClassTrainnerDetailPage from "./pages/trainner/ClassDetail";
+import ScheduleTrainnerPage from "./pages/trainner/schedule";
 
 function App() {
     const {
@@ -39,12 +48,15 @@ function App() {
         SubNav = function () {
             return <div></div>;
         };
+    } else if (path === "trainner") {
+        SubNav = SubNavTrainner;
     } else {
         SubNav = SubNavSite;
     }
 
     return (
         <>
+            <Route path="/test" component={Test} />
             <Route exact path="/" component={Landing} />
             <Route exact path={PATH.LOGIN} component={LoginPage} />
             <div>
@@ -64,7 +76,7 @@ function App() {
                             />
                             <Route
                                 exact
-                                path={PATH.SCORE}
+                                path={`${PATH.SCORE}/:idClass`}
                                 component={ScorePage}
                             />
                             <Route
@@ -106,8 +118,28 @@ function App() {
                             />
                             <Route
                                 exact
+                                path={`${PATH.ADMIN_CLASS}/:id`}
+                                component={ManagerClassDetailPage}
+                            />
+                            <Route
+                                exact
                                 path={PATH.ADMIN_CLASS}
                                 component={ManagerClassPage}
+                            />
+                            <Route
+                                exact
+                                path={PATH.TOPIC_ADMIN}
+                                component={TopicPage}
+                            />
+                            <Route
+                                exact
+                                path={PATH.ADMIN_SCORE}
+                                component={ManagerScore}
+                            />
+                            <Route
+                                exact
+                                path={PATH.ADMIN_PROFILE}
+                                component={ProfilePage}
                             />
 
                             {/* Mamanger */}
@@ -120,6 +152,28 @@ function App() {
                                 exact
                                 path={PATH.MANAGER_CATEGORY}
                                 component={ManagerCategoryPage}
+                            />
+
+                            {/* Trainner */}
+                            <Route
+                                exact
+                                path={PATH.TRAINNER}
+                                component={ClassTrainnerPage}
+                            />
+                            <Route
+                                exact
+                                path={`${PATH.CLASS_TRAINNER}/:idClass`}
+                                component={ClassTrainnerDetailPage}
+                            />
+                            <Route
+                                exact
+                                path={PATH.TRAINNER_PROFILE}
+                                component={ProfilePage}
+                            />
+                            <Route
+                                exact
+                                path={`${PATH.SCHEDULE_TRAINNER}/:idClass`}
+                                component={ScheduleTrainnerPage}
                             />
                         </Switch>
                         <Alert />

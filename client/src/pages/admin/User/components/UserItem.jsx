@@ -14,7 +14,7 @@ const UserItem = ({
     return (
         <div className="t-body text-sm text-gray-700 font-semibold col-span-3 mt-6">
             <div className="hover:bg-gray-100 rounded-lg border border-gray-200 shadow-sm mb-3">
-                <ul className="grid grid-cols-7 gap-4 transform translate-y-1 p-2.5">
+                <ul className="grid grid-cols-7 gap-4 transform translate-y-1 pt-2 px-2">
                     <li
                         className="col-span-5 cursor-pointer"
                         onClick={() => onFindUser(user?.userCode)}

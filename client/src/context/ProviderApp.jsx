@@ -16,98 +16,101 @@ import Major from "../apis/majors";
 import { PATH } from "../contants/PATH";
 
 const Provider = ({ children }) => {
-  const [authState, dispatchAuth] = useReducer(authReducer, initialStateAuth);
-  const [majorState, dispatchMajor] = useReducer(
-    majorsReducer,
-    initialStateMajors
-  );
-  const [courseState, dispatchCourse] = useReducer(
-    courseReducer,
-    initialStateCourse
-  );
-  const [classState, dispatchClass] = useReducer(
-    classReducer,
-    initialStateClass
-  );
-  const [scoreState, dispatchScore] = useReducer(
-    scoreReducer,
-    initialStateScore
-  );
-  const [alertState, dispatchAlert] = useReducer(
-    alertReducer,
-    initialStateAlert
-  );
+    const [authState, dispatchAuth] = useReducer(authReducer, initialStateAuth);
+    const [majorState, dispatchMajor] = useReducer(
+        majorsReducer,
+        initialStateMajors
+    );
+    const [courseState, dispatchCourse] = useReducer(
+        courseReducer,
+        initialStateCourse
+    );
+    const [classState, dispatchClass] = useReducer(
+        classReducer,
+        initialStateClass
+    );
+    const [scoreState, dispatchScore] = useReducer(
+        scoreReducer,
+        initialStateScore
+    );
+    const [alertState, dispatchAlert] = useReducer(
+        alertReducer,
+        initialStateAlert
+    );
 
-  useEffect(() => {
-    if (localStorage.getItem("token")) {
-      dispatchAuth(authActions.login_success());
-    } else {
-      dispatchAuth(authActions.login_fail());
-      localStorage.removeItem("token");
-    }
-  }, []);
-
-  useEffect(() => {
-    async function fetchData() {
-      if (localStorage.getItem("token")) {
-        axiosClient.defaults.headers.common["Authorization"] =
-          "Bearer " + localStorage.getItem("token");
-        try {
-          const response = await Auth.user();
-
-          if (response.userCode) {
-            const role = response.userCode.split("-")[0];
-            dispatchAuth(authActions.user_success({ data: response, role }));
+    useEffect(() => {
+        if (localStorage.getItem("token")) {
             dispatchAuth(authActions.login_success());
-          } else {
-            <Redirect to={PATH.LOGIN} />;
-          }
-        } catch (error) {
-          dispatchAuth(authActions.login_fail());
-          localStorage.removeItem("token");
+        } else {
+            dispatchAuth(authActions.login_fail());
+            localStorage.removeItem("token");
         }
-      }
-    }
+    }, []);
 
-    fetchData();
-  }, [dispatchAuth]);
+    useEffect(() => {
+        async function fetchData() {
+            if (localStorage.getItem("token")) {
+                axiosClient.defaults.headers.common["Authorization"] =
+                    "Bearer " + localStorage.getItem("token");
+                try {
+                    const response = await Auth.user();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await Major.getMajors();
-
-        if (response) {
-          dispatchMajor(majorActions.get_mojors(response));
+                    if (response.userCode) {
+                        const role = response.userCode.split("-")[0];
+                        dispatchAuth(
+                            authActions.user_success({ data: response, role })
+                        );
+                        dispatchAuth(authActions.login_success());
+                    } else {
+                        <Redirect to={PATH.LOGIN} />;
+                    }
+                } catch (error) {
+                    dispatchAuth(authActions.login_fail());
+                    localStorage.removeItem("token");
+                }
+            }
         }
-      } catch (error) {
-        console.log(error);
-      }
-    };
 
-    fetchData();
-  }, [dispatchMajor]);
+        fetchData();
+    }, [dispatchAuth]);
 
-  return (
-    <ProviderContext.Provider
-      value={{
-        authState,
-        dispatchAuth,
-        majorState,
-        dispatchMajor,
-        courseState,
-        dispatchCourse,
-        classState,
-        dispatchClass,
-        scoreState,
-        dispatchScore,
-        alertState,
-        dispatchAlert,
-      }}
-    >
-      {children}
-    </ProviderContext.Provider>
-  );
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await Major.getMajors();
+
+                if (response) {
+                    console.log(response);
+                    dispatchMajor(majorActions.get_mojors(response.majors));
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
+        fetchData();
+    }, [dispatchMajor]);
+
+    return (
+        <ProviderContext.Provider
+            value={{
+                authState,
+                dispatchAuth,
+                majorState,
+                dispatchMajor,
+                courseState,
+                dispatchCourse,
+                classState,
+                dispatchClass,
+                scoreState,
+                dispatchScore,
+                alertState,
+                dispatchAlert,
+            }}
+        >
+            {children}
+        </ProviderContext.Provider>
+    );
 };
 
 export default Provider;

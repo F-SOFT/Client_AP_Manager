@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-function CreateCourse({ isOpen, onClose }) {
+function CreateCourse({ isOpen, onClose, onRefesh }) {
     const classes = useStyles();
     const {
         majorState: { majors },
@@ -61,6 +61,7 @@ function CreateCourse({ isOpen, onClose }) {
 
         try {
             const response = await Course.postCourse(formData);
+            onRefesh();
             if (response) {
                 onClose();
                 dispatchCourse(

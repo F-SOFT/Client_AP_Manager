@@ -67,10 +67,12 @@ const ClassPage = () => {
                 ) : (
                     <div>
                         <div className="mt-14">
-                            <CourseDetail
-                                description={course?.description}
-                                image={course?.image}
-                            />
+                            <div>
+                                <CourseDetail
+                                    description={course?.description}
+                                    image={course?.image}
+                                />
+                            </div>
                         </div>
 
                         <div>
@@ -85,6 +87,7 @@ const ClassPage = () => {
                                               (classeCourse) => (
                                                   <ClassItem
                                                       key={classeCourse._id}
+                                                      id={classeCourse._id}
                                                       name={classeCourse.name}
                                                       teacher={
                                                           classeCourse.teacherId
@@ -93,15 +96,23 @@ const ClassPage = () => {
                                                       iconLock={
                                                           classeCourse?.classCode ===
                                                           classData?.classUser
-                                                              ?.classCode ? (
-                                                              <path d="M10 2a5 5 0 00-5 5v2a2 2 0 00-2 2v5a2 2 0 002 2h10a2 2 0 002-2v-5a2 2 0 00-2-2H7V7a3 3 0 015.905-.75 1 1 0 001.937-.5A5.002 5.002 0 0010 2z" />
-                                                          ) : (
-                                                              <path
-                                                                  fillRule="evenodd"
-                                                                  d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                                                                  clipRule="evenodd"
-                                                              />
-                                                          )
+                                                              ?.classCode
+                                                              ? {
+                                                                    acess: true,
+                                                                    path: (
+                                                                        <path d="M10 2a5 5 0 00-5 5v2a2 2 0 00-2 2v5a2 2 0 002 2h10a2 2 0 002-2v-5a2 2 0 00-2-2H7V7a3 3 0 015.905-.75 1 1 0 001.937-.5A5.002 5.002 0 0010 2z" />
+                                                                    ),
+                                                                }
+                                                              : {
+                                                                    acess: false,
+                                                                    path: (
+                                                                        <path
+                                                                            fillRule="evenodd"
+                                                                            d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                                                                            clipRule="evenodd"
+                                                                        />
+                                                                    ),
+                                                                }
                                                       }
                                                   />
                                               )

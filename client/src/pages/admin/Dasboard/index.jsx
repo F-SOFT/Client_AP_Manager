@@ -11,8 +11,9 @@ const AdminPage = () => {
         authState,
         dispatchAuth,
         dispatchMajor,
-        majorState: { isLoading, majors },
+        majorState: { isLoading },
     } = useStore();
+    const [majors, setMajors] = useState([]);
     const [isLoad, setIsLoad] = useState(true);
     console.log(majors);
     useEffect(() => {
@@ -20,7 +21,7 @@ const AdminPage = () => {
             if (authState.isAuthenticated) {
                 try {
                     const response = await Auth.users();
-
+                    console.log(response);
                     if (response) {
                         dispatchAuth(actions.authActions.get_users(response));
                         setIsLoad(false);
@@ -41,8 +42,9 @@ const AdminPage = () => {
 
                 if (response) {
                     dispatchMajor(
-                        actionsMajor.majorActions.get_mojors(response)
+                        actionsMajor.majorActions.get_mojors(response.majors)
                     );
+                    setMajors(response.majors);
                 }
             } catch (error) {
                 console.log(error);
@@ -55,12 +57,12 @@ const AdminPage = () => {
     const myData = Object.keys(authState.users).map((key) => {
         return authState.users[key];
     });
-
+    console.log(myData);
     return (
         <div className="page bg-white">
             <div className="mx-10">
                 <div className="text-gradient w-max">
-                    <p className="text-2xl text-white font-bold pt-2 pl-14">
+                    <p className="text-3xl text-white font-semibold pt-1.5 pl-14">
                         Dasboard
                     </p>
                 </div>
@@ -86,7 +88,7 @@ const AdminPage = () => {
                             />
                             <Card
                                 name={"Khoá học hiện có"}
-                                total={majors.length}
+                                total={majors?.length}
                                 icon={
                                     <path
                                         strokeLinecap="round"
@@ -109,7 +111,7 @@ const AdminPage = () => {
                                         <div key={major._id}>
                                             <CardTrending
                                                 name={major.name}
-                                                _total={myData[i]}
+                                                _total={myData[i + 1]}
                                             />
                                         </div>
                                     ))}
